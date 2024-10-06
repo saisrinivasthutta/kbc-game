@@ -1,23 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React, { useState } from "react";
+import { QRCodeDisplay } from "./components/QRCodeDisplay";
+import { ComputerScreen } from "./components/ComputerScreen";
+import { MobileScreen } from "./components/MobileScreen";
+import { questions } from "./data/questions";
 
 function App() {
+  const [players, setPlayers] = useState([]); // List of players
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [correctPlayer, setCorrectPlayer] = useState(null);
+
+  const handlePlayerJoin = (playerName) => {
+    setPlayers((prevPlayers) => [...prevPlayers, playerName]);
+  };
+
+  const handleAnswer = (playerName, answer) => {
+    const correctAnswer = questions[currentQuestionIndex].correctAnswer;
+    if (answer === correctAnswer) {
+      setCorrectPlayer(playerName);
+      setTimeout(() => {
+        setCorrectPlayer(null);
+        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+      }, 2000);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {/* Computer Screen View */}
+      <ComputerScreen
+        players={players}
+        currentQuestion={questions[currentQuestionIndex]}
+        correctPlayer={correctPlayer}
+      />
+
+      {/* QR Code for Players to Join */}
+      <QRCodeDisplay />
+
+      {/* Mobile Screen for Answer Submission */}
+      <MobileScreen onPlayerJoin={handlePlayerJoin} onAnswer={handleAnswer} />
     </div>
   );
 }
